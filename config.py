@@ -9,7 +9,7 @@ class Config:
     HF_BASE_URL: str = "https://huggingface.co"
     HF_API_URL: str = "https://huggingface.co/api/models"
     ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-    UPDATE_TIME: str = "09:00"
+    UPDATE_TIME: str = "03:00"
     MODEL_LIMIT: int = 10
 
     @classmethod

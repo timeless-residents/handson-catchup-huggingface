@@ -1,12 +1,25 @@
-import time
-
-import schedule
+import argparse
+import logging
+from pathlib import Path
 
 from config import Config
 from models.huggingface import HuggingFaceModel
 from services.huggingface import HuggingFaceService
 from services.notion import NotionService
 from services.scraper import HuggingFaceScraper
+
+# ロギングの設定
+log_dir = Path.home() / "Library" / "Logs" / "handson-catchup-huggingface"
+log_dir.mkdir(parents=True, exist_ok=True)
+log_file = log_dir / "application.log"
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler(log_file), logging.StreamHandler()],
+)
+
+logger = logging.getLogger(__name__)
 
 
 class ModelTracker:
@@ -18,7 +31,7 @@ class ModelTracker:
     def run_update(self):
         """トレンド情報の更新を実行"""
         try:
-            print("\n=== 日次アップデート開始 ===")
+            logger.info("=== 日次アップデート開始 ===")
 
             # トレンドモデルの取得
             trend_data = self.scraper.get_trending_models_data()
@@ -36,36 +49,36 @@ class ModelTracker:
 
             if trending_models and popular_models:
                 self.notion_service.create_page(popular_models, trending_models)
-                print("アップデート完了")
+                logger.info("アップデート完了")
             else:
-                print("モデルの取得に失敗しました")
+                logger.error("モデルの取得に失敗しました")
 
-            print("=== 日次アップデート終了 ===\n")
+            logger.info("=== 日次アップデート終了 ===")
 
         except Exception as e:
-            print(f"エラーが発生しました: {str(e)}")
+            logger.error("エラーが発生しました: %s", str(e), exc_info=True)
+            raise
 
 
 def main():
-    # 設定の検証
-    Config.validate()
-
-    tracker = ModelTracker()
-
-    # 初回実行
-    print("初回実行を開始します...")
-    tracker.run_update()
-
-    # スケジューラーの設定
-    print(f"スケジューラーを開始します（毎日 {Config.UPDATE_TIME} に実行）")
-    schedule.every().day.at(Config.UPDATE_TIME).do(tracker.run_update)
+    parser = argparse.ArgumentParser(description="AI Model Trend Tracker")
+    parser.add_argument("--check", action="store_true", help="設定の検証のみを実行")
+    args = parser.parse_args()
 
     try:
-        while True:
-            schedule.run_pending()
-            time.sleep(60)
-    except KeyboardInterrupt:
-        print("\nプログラムを終了します")
+        # 設定の検証
+        Config.validate()
+        if args.check:
+            logger.info("設定の検証が完了しました")
+            return
+
+        # 更新の実行
+        tracker = ModelTracker()
+        tracker.run_update()
+
+    except Exception as e:
+        logger.error("致命的なエラーが発生しました: %s", str(e), exc_info=True)
+        raise
 
 
 if __name__ == "__main__":
