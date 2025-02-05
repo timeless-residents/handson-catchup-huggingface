@@ -1,0 +1,64 @@
+[MASTER]
+# スクリプトの内容がimportされないようにする
+ignore=CVS
+
+# 並列実行するプロセス数
+jobs=1
+
+[MESSAGES CONTROL]
+# 無効化する警告
+disable=C0111,  # missing-docstring
+        C0103,  # invalid-name
+        C0301,  # line-too-long
+        C0114,  # missing-module-docstring
+        C0115,  # missing-class-docstring
+        C0116,  # missing-function-docstring
+        R0903,  # too-few-public-methods
+        W0621,  # redefined-outer-name
+        R0913,  # too-many-arguments
+        W0703   # broad-except
+
+[REPORTS]
+# 出力形式
+output-format=text
+
+# Include a brief explanation of each error
+msg-template={path}:{line}: [{msg_id}({symbol}), {obj}] {msg}
+
+[FORMAT]
+# 1行の最大文字数
+max-line-length=120
+
+# インデントのスペース数
+indent-after-paren=4
+
+[BASIC]
+# 変数名の命名規則
+variable-rgx=[a-z_][a-z0-9_]{0,30}$
+
+# 関数名の命名規則
+function-rgx=[a-z_][a-z0-9_]{0,30}$
+
+# メソッド名の命名規則
+method-rgx=[a-z_][a-z0-9_]{0,30}$
+
+# 引数名の命名規則
+argument-rgx=[a-z_][a-z0-9_]{0,30}$
+
+# クラス属性の命名規則
+class-attribute-rgx=([A-Za-z_][A-Za-z0-9_]{0,30}|(__.*__))$
+
+# クラス名の命名規則
+class-rgx=[A-Z_][a-zA-Z0-9]+$
+
+[SIMILARITIES]
+# 重複コードと判定する最小行数
+min-similarity-lines=4
+
+[TYPECHECK]
+# 外部ライブラリのメンバーをチェックしない
+ignored-modules=numpy,tensorflow,torch,cv2
+
+[MISCELLANEOUS]
+# Pythonのバージョンを指定
+notes=FIXME,XXX,TODO
